@@ -1,0 +1,51 @@
+version: '3.1'
+services:
+  user-db:
+    image: mongo
+    hostname: user-db
+    container_name: user-db
+  stock-db:
+    image: mongo
+    hostname: stock-db
+    container_name: stock-db
+  user-service:
+    container_name: user-service
+    hostname: user-service
+    build:
+      context: user-service
+      dockerfile: Dockerfile
+    depends_on: [ user-db, discovery-service ]
+    environment:
+      - EUREKA_SERVER=http://discovery-service:8761/eureka
+  stock-service:
+    container_name: stock-service
+    hostname: stock-service
+    build:
+      context: stock-service
+      dockerfile: Dockerfile
+    depends_on: [ stock-db, discovery-service ]
+    environment:
+      - EUREKA_SERVER=http://discovery-service:8761/eureka
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: api-gateway
+      dockerfile: Dockerfile
+    depends_on: [ stock-service, user-service, discovery-service ]
+    environment:
+      - EUREKA_SERVER=http://discovery-service:8761/eureka
+    ports:
+      - 8080:8080
+  discovery-service:
+    container_name: discovery-service
+    hostname: discovery-service
+    ports:
+    - 8761:8761
+    build:
+      context: discovery-service
+      dockerfile: Dockerfile
+
+networks:
+  spring-cloud-network:
+    driver: bridge
+

@@ -1,0 +1,152 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: lobinhood
+servers:
+  - url: 'http://localhost:8080'
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    Stock:
+      type: object
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+        name:
+          type: string
+    TransactionReport:
+      type: object
+      properties:
+        createdOn:
+          type: integer
+        numberOfStock:
+          type: number
+        stockPrice:
+          type: integer
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+
+paths:
+  /auth/sign_up:
+    post:
+      summary: 'Creates a user account'
+      operationId: signUp
+      tags:
+        - user-service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: 'Created'
+          headers:
+            Authorization:
+              description: The Authorization token that should be used for every request for the account
+              schema:
+                type: string
+                example: "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2YXJ5YUB0ZXN0LmNvbSIsImV4cCI6MTYxODMyNDczOX0.pjfzOtHedecItn_Dg_a3XXv0aW7GxpJArMjjC1m_4ezLAN613NBY1-GPH8vEC6caevOOzMovOsxD4akueTE9CQ"
+        '409':
+          description: 'Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/sign_in:
+    post:
+      summary: 'Signs in to a user account'
+      tags:
+        - user-service
+      operationId: signIn
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: 'Created'
+          headers:
+            Authorization:
+              description: The Authorization token that should be used for every request for the account
+              schema:
+                type: string
+                example: "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2YXJ5YUB0ZXN0LmNvbSIsImV4cCI6MTYxODMyNDczOX0.pjfzOtHedecItn_Dg_a3XXv0aW7GxpJArMjjC1m_4ezLAN613NBY1-GPH8vEC6caevOOzMovOsxD4akueTE9CQ"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /stock:
+    get:
+      summary: 'Get stock details'
+      tags:
+        - stock-service
+      operationId: getStock
+      parameters:
+        - name: 'stockId'
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns list of one stock which matches the stockId in the parameter, if no parameter is supplied
+            then list of all the stock is returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Stock'
+  /stock/buy:
+    post:
+      summary: 'Buy stock'
+      tags:
+        - stock-service
+      operationId: buyStock
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stockId:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionReport'
+
