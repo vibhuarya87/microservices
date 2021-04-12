@@ -7,7 +7,7 @@ servers:
 
 components:
   schemas:
-    User:
+    ApplicationUser:
       type: object
       required:
         - username
@@ -48,17 +48,17 @@ components:
           type: string
 
 paths:
-  /auth/sign_up:
+  /sign_up:
     post:
       summary: 'Creates a user account'
       operationId: signUp
       tags:
-        - user-service
+        - authz-service
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/ApplicationUser'
       responses:
         '201':
           description: 'Created'
@@ -80,20 +80,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /auth/sign_in:
+  /login:
     post:
       summary: 'Signs in to a user account'
       tags:
-        - user-service
+        - authz-service
       operationId: signIn
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/ApplicationUser'
       responses:
-        '201':
-          description: 'Created'
+        '200':
+          description: 'Ok'
           headers:
             Authorization:
               description: The Authorization token that should be used for every request for the account
@@ -142,6 +142,10 @@ paths:
               properties:
                 stockId:
                   type: string
+                accountId:
+                  type: string
+                numberOfStock:
+                  type: number
       responses:
         '200':
           description: OK
@@ -149,4 +153,105 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransactionReport'
-
+  /stock/buy/schedule:
+    post:
+      summary: 'Schedule Buying stock'
+      tags:
+        - stock-service
+      operationId: scheduleBuyingStock
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stockId:
+                  type: string
+                accountId:
+                  type: string
+                numberOfStock:
+                  type: number
+                timestamp:
+                  type: number
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionReport'
+  /stock/sell:
+    post:
+      summary: 'Sell stock'
+      tags:
+        - stock-service
+      operationId: sellStock
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stockId:
+                  type: string
+                accountId:
+                  type: string
+                numberOfStock:
+                  type: number
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionReport'
+  /stock/sell/schedule:
+    post:
+      summary: 'Schedule Selling stock'
+      tags:
+        - stock-service
+      operationId: scheduleSellingStock
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stockId:
+                  type: string
+                accountId:
+                  type: string
+                numberOfStock:
+                  type: number
+                timestamp:
+                  type: number
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionReport'
+  /stock/history:
+    post:
+      summary: 'Stock transaction history'
+      tags:
+        - stock-service
+      operationId: stockHistory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  - $ref: '#/components/schemas/TransactionReport'

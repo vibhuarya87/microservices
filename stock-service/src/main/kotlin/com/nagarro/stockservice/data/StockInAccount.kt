@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 data class StockInAccount(
     @Id val id: ObjectId = ObjectId.get(),
-    val stock: Stock,
+    val stockID: String,
     val accountID: String,
-    val numberOfStock: Double
+    var numberOfStock: Double = 0.0
 )

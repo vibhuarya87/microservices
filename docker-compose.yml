@@ -1,20 +1,28 @@
 version: '3.1'
 services:
-  user-db:
+  account-db:
     image: mongo
-    hostname: user-db
-    container_name: user-db
+    hostname: account-db
+    container_name: account-db
+  authz-db:
+    image: mongo
+    hostname: authz-db
+    container_name: authz-db
   stock-db:
     image: mongo
     hostname: stock-db
     container_name: stock-db
-  user-service:
-    container_name: user-service
-    hostname: user-service
+  wallet-db:
+    image: mongo
+    hostname: wallet-db
+    container_name: wallet-db
+  account-service:
+    container_name: account-service
+    hostname: account-service
     build:
-      context: user-service
+      context: account-service
       dockerfile: Dockerfile
-    depends_on: [ user-db, discovery-service ]
+    depends_on: [ account-db, discovery-service ]
     environment:
       - EUREKA_SERVER=http://discovery-service:8761/eureka
   stock-service:
@@ -26,12 +34,21 @@ services:
     depends_on: [ stock-db, discovery-service ]
     environment:
       - EUREKA_SERVER=http://discovery-service:8761/eureka
-  api-gateway:
-    container_name: api-gateway
+  wallet-service:
+    container_name: wallet-service
+    hostname: wallet-service
     build:
-      context: api-gateway
+      context: wallet-service
       dockerfile: Dockerfile
-    depends_on: [ stock-service, user-service, discovery-service ]
+    depends_on: [ wallet-db, discovery-service ]
+    environment:
+      - EUREKA_SERVER=http://discovery-service:8761/eureka
+  authz-service:
+    container_name: authz-service
+    build:
+      context: authz-service
+      dockerfile: Dockerfile
+    depends_on: [ stock-service, account-service, discovery-service ]
     environment:
       - EUREKA_SERVER=http://discovery-service:8761/eureka
     ports:

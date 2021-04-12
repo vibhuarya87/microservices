@@ -8,12 +8,10 @@ import java.time.LocalDate
 @Document
 data class StockTransaction(
     @Id val id: ObjectId = ObjectId.get(),
-    val updatedAt: LocalDate = LocalDate.now(),
     val type: StockTransactionType,
-    val stock: Stock,
+    val stockID: String,
     val accountID: String,
-    val amount: Double,
-    val numberOfStock: Int
+    val numberOfStock: Double
 )
 
 enum class StockTransactionType {
